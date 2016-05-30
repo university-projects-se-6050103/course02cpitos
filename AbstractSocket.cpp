@@ -20,7 +20,4 @@ public:
     virtual void close() { }
 };
 
-
-void f();
-
 AbstractSocket &createSocket();

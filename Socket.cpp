@@ -10,6 +10,9 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <cstring>
+#include <memory>
+#include <fcntl.h>
 
 using namespace std;
 
@@ -51,6 +54,7 @@ void Socket::listen(const char *host, int port) {
     cerr << "I'm listening to port " << port << " at host " << host << endl;
 
     struct sockaddr_in my_serv_addr;
+    std::memset(&my_serv_addr, 0, sizeof(sockaddr_in));
     my_serv_addr.sin_family = AF_INET;
     my_serv_addr.sin_port = htons((uint16_t) port);
     my_serv_addr.sin_addr.s_addr = inet_addr(host);
@@ -63,18 +67,41 @@ void Socket::listen(const char *host, int port) {
 }
 
 AbstractSocket &Socket::accept() {
+    std::unique_ptr<Socket> client(new Socket());
+
     cerr << "accept" << endl;
     socklen_t sockStructSize = sizeof(struct sockaddr);
-    SOCKET client = ::accept(socket, &socketAddr, &sockStructSize);
-    return *new Socket(client);
+
+    // Set the socket to a nonblocking mode
+    fcntl(socket, F_SETFL, O_NONBLOCK);
+
+    SOCKET sock = ::accept(socket, &socketAddr, &sockStructSize);
+    //set accept socket address
+    client->socketAddr = socketAddr;
+    //set accept socket handler
+    client->socket = sock;
+    return ((AbstractSocket &) *client.release());
 }
 
 void Socket::connect(const char *host, int port) {
     cerr << "I'm connecting to port " << port << " at host " << host << endl;
+    //create new socket
+    SOCKET sock = ::socket(AF_INET, SOCK_STREAM, 0);    //socket is create?
+
+    //god father socket
+    struct sockaddr_in serverAddress;
+    std::memset(&serverAddress, 0, sizeof(sockaddr_in));
+    serverAddress.sin_family = AF_INET;
+    serverAddress.sin_port = htons((uint16_t) port);
+    serverAddress.sin_addr.s_addr = inet_addr(host);
+
+    ::connect(sock, (const struct sockaddr *) &serverAddress, sizeof(serverAddress));
 }
 
 void Socket::write(const char *message) {
+    cout << message;
     cerr << "Send message " << message << endl;
+    ::send(socket, message, sizeof(message), 0);
 }
 
 const char *Socket::read() {
@@ -84,5 +111,6 @@ const char *Socket::read() {
 }
 
 void Socket::close() {
+    ::shutdown(socket, 0);
     ::close(socket);
 }
