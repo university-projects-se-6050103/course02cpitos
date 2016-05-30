@@ -99,7 +99,6 @@ void Socket::connect(const char *host, int port) {
 }
 
 void Socket::write(const char *message) {
-    cout << message;
     cerr << "Send message " << message << endl;
     ::send(socket, message, sizeof(message), 0);
 }

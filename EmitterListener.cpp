@@ -12,5 +12,6 @@ AbstractSocket &run_server() {
 
 AbstractSocket &run_client(AbstractSocket &server) {
     AbstractSocket &client = server.accept();
+    client.connect("127.0.0.1", 15591);
     return client;
 }
