@@ -13,11 +13,12 @@ Storage::Storage() {
 
 char *Storage::putInto(char *key, char *value) {
     storageMap[key] = value;
+    printf("put %s into %s", value, key);
     return (char *) "OK";
 }
 
 char *Storage::getFrom(char *key) {
-    return storageMap.find(key)->first;
+    char *value = storageMap.find(key)->first;
+    printf("get from %s value %s", key, value);
+    return value;
 }
-
-

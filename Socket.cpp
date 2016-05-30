@@ -100,12 +100,27 @@ void Socket::connect(const char *host, int port) {
 
 void Socket::write(const char *message) {
     cerr << "Send message " << message << endl;
+    cout << message << endl;
     ::send(socket, message, sizeof(message), 0);
 }
 
 const char *Socket::read() {
     char *buf = new char[1024];
-    buf[recv(socket, buf, sizeof(buf), 0)] = 0;
+
+    fd_set read_flags, write_flags;
+    FD_ZERO(&read_flags);
+    FD_ZERO(&write_flags);
+    FD_SET(socket, &read_flags);
+    FD_SET(socket, &write_flags);
+    FD_SET(STDIN_FILENO, &read_flags);
+    FD_SET(STDIN_FILENO, &write_flags);
+
+    if (FD_ISSET(socket, &read_flags)) {
+        //clear set
+        FD_CLR(socket, &read_flags);
+        buf[recv(socket, buf, sizeof(buf), 0)] = 0;
+    }
+
     return buf;
 }
 

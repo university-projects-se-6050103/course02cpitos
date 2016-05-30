@@ -7,6 +7,7 @@
 
 class Storage {
 
+public:
     Storage();
 
     char *putInto(char *key, char *value);
