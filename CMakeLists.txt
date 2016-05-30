@@ -3,5 +3,5 @@ project(course02lab05os)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-set(SOURCE_FILES main.cpp EmitterListener.cpp EmitterListener.h AbstractSocket.cpp Socket.cpp)
+set(SOURCE_FILES main.cpp EmitterListener.cpp EmitterListener.h AbstractSocket.cpp Socket.cpp Storage.cpp Storage.h)
 add_executable(course02lab05os ${SOURCE_FILES})
